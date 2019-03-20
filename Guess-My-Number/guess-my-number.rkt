@@ -22,7 +22,7 @@
 (define NUM-SIZE 80)
 (define NUM-COLOR "Dark Slate Gray")
 
-;; Game windown width and height
+;; Game window width and height
 (define WIDTH (* (image-width HELP-TEXT2) 1.3))
 (define HEIGHT 300)
 
