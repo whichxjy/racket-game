@@ -38,13 +38,13 @@
 
 #|--------------------------------------------------------|#
 
-(struct pit (snake goos))
+(struct pit (snake goos) #:transparent)
 
-(struct snake (dir segs))
+(struct snake (dir segs) #:transparent)
 
-(struct goo (loc expire))
+(struct goo (loc expire) #:transparent)
 
-(struct posn (x y))
+(struct posn (x y) #:transparent)
 
 #|--------------------------------------------------------|#
 
@@ -233,9 +233,7 @@
 ;; End Game
 
 (define (self-colliding? snake)
-  (cons? (memf (lambda(arg)
-                 (posn=? (snake-head snake) arg))
-               (snake-body snake))))
+  (cons? (member (snake-head snake) (snake-body snake))))
 
 (define (wall-colliding? snake)
   (define x (posn-x (snake-head snake)))
