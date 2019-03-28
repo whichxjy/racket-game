@@ -6,6 +6,10 @@
 
 ;; Constants
 
+;; assumed display dimensions
+(define DISPLAY-WIDTH 2560)
+(define DISPLAY-HEIGHT 1440)
+
 ; initalization constants
 (define PLAYER# 2)
 (define DICE# 3)
@@ -15,6 +19,7 @@
 (define INIT-SPARE-DICE 10)
 
 ; The depth at which to limit the gametree
+; The depth at which to limit the game tree
 (define AI-DEPTH 4)
 (define AI 1)
 
@@ -61,9 +66,9 @@
   (empty-scene WIDTH HEIGHT))
 (define (ISCENE)
   (define mt (PLAIN))
-  (when (or (> (image-width mt) 1280) (> (image-height mt) 800))
+  (when (or (> (image-width mt) DISPLAY-WIDTH) (> (image-height mt) DISPLAY-HEIGHT))
     (error 'scene
-           "it is impossible to draw a ~s x ~s game scene for a 1280 x 800 laptop screen"
+           "it is impossible to draw a ~s x ~s game scene for your screen"
            (image-width mt) (image-height mt)))
   (place-image INSTRUCTIONS (* .5 WIDTH) (* .9 HEIGHT) mt))
 
@@ -71,11 +76,25 @@
 
 (struct dice-world (src board gt) #:transparent)
 
-(struct game (board player moves) #:transparent)
+(define-values (game game? game-board game-player game-moves)
+  (let ()
+    (struct game (board player delayed-moves) #:transparent)
+    (values game
+            game? 
+            game-board 
+            game-player 
+            (lambda (g) (force (game-delayed-moves g))))))
 
 (struct move (action gt) #:transparent)
 
 (struct territory (index player dice x y) #:transparent)
+
+#|-----------------------------------------------------------------------|#
+
+(define (game-tree=? gt1 gt2)
+  (and (equal? (game-player gt1) (game-player gt2))
+       (equal? (game-board gt1) (game-board gt2))
+       (= (length (game-moves gt1)) (length (game-moves gt2)))))
 
 #|-----------------------------------------------------------------------|#
 
@@ -271,7 +290,11 @@
   ;; Find the desired passing move in the list of moves of the game tree
   (define move (find-move (game-moves (dice-world-gt world)) '()))
   (cond [(not move) world]
-        [else (dice-world #f (game-board move) move)]))
+        [(or (no-more-moves? move) (not (= (game-player move) AI)))
+          (dice-world #f (game-board move) move)]
+        [else
+          (define ai (the-ai-plays move))
+          (dice-world #f (game-board ai) ai)]))
 
 (define (attacking world source target)
   (define feasible (game-moves (dice-world-gt world)))
