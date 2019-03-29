@@ -18,7 +18,6 @@
 (define INIT-PLAYER 0)
 (define INIT-SPARE-DICE 10)
 
-; The depth at which to limit the gametree
 ; The depth at which to limit the game tree
 (define AI-DEPTH 4)
 (define AI 1)
