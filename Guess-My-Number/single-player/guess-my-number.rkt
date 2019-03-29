@@ -2,7 +2,7 @@
 
 (require 2htdp/universe 2htdp/image)
 
-(struct interval (small big))
+(struct interval (small big) #:transparent)
 
 ;; Help text size and color
 (define HELP-TEXT-SIZE 20)
